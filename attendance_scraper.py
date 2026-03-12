@@ -23,8 +23,8 @@ import re
 # ==============================
 # ✅ YOUR CMS LOGIN DETAILS
 # ==============================
-ENROLLMENT = "02-131232-059"
-PASSWORD   = "bukc-bse2026"
+ENROLLMENT = "enrollmemt"
+PASSWORD   = "pass"
 
 # ==============================
 # ✅ BROWSER SETUP

@@ -38,8 +38,8 @@ def send_notification(title, message, urgent=False):
 # ==============================
 # ✅ USER LOGIN DETAILS — EDIT THESE
 # ==============================
-ENROLLMENT = "02-131232-059"
-PASSWORD = "bukc-bse2026"
+ENROLLMENT = "enrollment"
+PASSWORD = "pass"
 
 # ==============================
 # ✅ BROWSER SETUP
