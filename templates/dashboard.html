@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-brand">📚 Student Dashboard</div>
+        <div class="nav-actions">
+            <a href="/logout" class="btn btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('assignments', this)">📋 Assignments</button>
+        <button class="tab-btn" onclick="switchTab('attendance', this)">📊 Attendance</button>
+    </div>
+
+    <div class="container">
+
+        <!-- ==================== ASSIGNMENTS TAB ==================== -->
+        <div id="tab-assignments" class="tab-content active">
+
+            <!-- STATS CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="a-total">{{ stats.total }}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+                <div class="stat-card upcoming">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="a-upcoming">{{ stats.upcoming }}</div>
+                        <div class="stat-label">Upcoming</div>
+                    </div>
+                </div>
+                <div class="stat-card passed">
+                    <div class="stat-icon">🔴</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="a-passed">{{ stats.passed }}</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                </div>
+                <div class="stat-card urgent">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="a-urgent">{{ stats.urgent }}</div>
+                        <div class="stat-label">Due in 3 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="action-bar">
+                <button onclick="startAssignmentScraper()" class="btn btn-scrape" id="scrapeBtn">
+                    🤖 Refresh Assignments
+                </button>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterAssign('ALL', this)">All</button>
+                    <button class="filter-btn" onclick="filterAssign('UPCOMING', this)">Upcoming</button>
+                    <button class="filter-btn" onclick="filterAssign('PASSED', this)">Passed</button>
+                </div>
+            </div>
+
+            <!-- SCRAPER BANNER -->
+            <div id="assignBanner" class="scraper-banner" style="display:none;"></div>
+
+            <!-- TABLE -->
+            <div class="table-wrapper" id="assignTableWrap">
+                {% if assignments %}
+                <table class="data-table" id="assignTable">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Course</th><th>Assignment</th>
+                            <th>Deadline</th><th>Days Left</th><th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignTbody">
+                        {% for a in assignments %}
+                        <tr data-status="{{ a[3] }}">
+                            <td class="row-num">{{ loop.index }}</td>
+                            <td><span class="course-badge">{{ a[0] }}</span></td>
+                            <td class="title-cell">{{ a[1] }}</td>
+                            <td class="muted-cell">📅 {{ a[2] }}</td>
+                            <td>
+                                {% if a[3] == "UPCOMING" and a[4] is not none %}
+                                    {% if a[4] == 0 %}<span class="badge badge-critical">Today!</span>
+                                    {% elif a[4] == 1 %}<span class="badge badge-urgent">Tomorrow</span>
+                                    {% elif a[4] <= 3 %}<span class="badge badge-warning">{{ a[4] }} days</span>
+                                    {% else %}<span class="badge badge-safe">{{ a[4] }} days</span>
+                                    {% endif %}
+                                {% else %}<span class="badge badge-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a[3] == "UPCOMING" %}
+                                    <span class="pill pill-green">● Upcoming</span>
+                                {% else %}
+                                    <span class="pill pill-red">● Passed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state" id="assignEmpty">
+                    <div class="empty-icon">📭</div>
+                    <h3>No assignments yet</h3>
+                    <p>Click <strong>Refresh Assignments</strong> to fetch from CMS/LMS</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div><!-- /assignments tab -->
+
+
+        <!-- ==================== ATTENDANCE TAB ==================== -->
+        <div id="tab-attendance" class="tab-content">
+
+            <!-- HEADER -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📊 Class Attendance</h2>
+                    <p class="section-sub" id="attendUpdatedAt">Not loaded yet — click Refresh</p>
+                </div>
+                <button onclick="startAttendanceScraper()" class="btn btn-scrape" id="attendBtn">
+                    🤖 Refresh Attendance
+                </button>
+            </div>
+
+            <!-- STAT CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="at-total">—</div>
+                        <div class="stat-label">Total Courses</div>
+                    </div>
+                </div>
+                <div class="stat-card upcoming">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="at-safe">—</div>
+                        <div class="stat-label">Safe (≥75%)</div>
+                    </div>
+                </div>
+                <div class="stat-card urgent">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="at-warning">—</div>
+                        <div class="stat-label">Warning (60–74%)</div>
+                    </div>
+                </div>
+                <div class="stat-card passed">
+                    <div class="stat-icon">🚨</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="at-danger">—</div>
+                        <div class="stat-label">Danger (&lt;60%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANNER -->
+            <div id="attendBanner" class="scraper-banner" style="display:none;"></div>
+
+            <!-- FILTER + TABLE -->
+            <div class="action-bar">
+                <span class="section-title" style="font-size:15px;">Course-wise Attendance</span>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterAttend('ALL', this)">All</button>
+                    <button class="filter-btn" onclick="filterAttend('safe', this)">✅ Safe</button>
+                    <button class="filter-btn" onclick="filterAttend('warning', this)">⚠️ Warning</button>
+                    <button class="filter-btn" onclick="filterAttend('danger', this)">🚨 Danger</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="data-table" id="attendTable">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Code</th><th>Course Title</th><th>Teacher</th>
+                            <th>Present</th><th>Absent</th><th>Total</th>
+                            <th>Attendance %</th><th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendTbody">
+                        <tr id="attendPlaceholder">
+                            <td colspan="9">
+                                <div class="empty-state" style="padding:50px 0;">
+                                    <div class="empty-icon">📊</div>
+                                    <h3>No attendance data yet</h3>
+                                    <p>Click <strong>Refresh Attendance</strong> to load live data from CMS</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-note">
+                ℹ️ Attendance below <strong>75%</strong> may result in debarment from exams per Bahria University policy.
+            </div>
+
+        </div><!-- /attendance tab -->
+
+    </div><!-- /container -->
+
+    <footer class="footer">
+        Student Dashboard • Bahria University Karachi •
+        <span id="footerTime">—</span>
+    </footer>
+
+
+    <script>
+    // =====================================================
+    // TAB SWITCHING
+    // =====================================================
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+        if (name === 'attendance') loadSavedAttendance();
+    }
+
+    // =====================================================
+    // ASSIGNMENT FILTER
+    // =====================================================
+    function filterAssign(status, btn) {
+        document.querySelectorAll('#tab-assignments .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('#assignTable tbody tr[data-status]').forEach(row => {
+            row.style.display = (status === 'ALL' || row.dataset.status === status) ? '' : 'none';
+        });
+    }
+
+    // =====================================================
+    // ATTENDANCE FILTER
+    // =====================================================
+    function filterAttend(level, btn) {
+        document.querySelectorAll('#tab-attendance .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('#attendTbody tr[data-level]').forEach(row => {
+            row.style.display = (level === 'ALL' || row.dataset.level === level) ? '' : 'none';
+        });
+    }
+
+    // =====================================================
+    // ASSIGNMENT SCRAPER — start + poll
+    // =====================================================
+    let assignPollTimer = null;
+
+    function startAssignmentScraper() {
+        const btn    = document.getElementById('scrapeBtn');
+        const banner = document.getElementById('assignBanner');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Scraping... please wait';
+        showBanner(banner, 'info', '⏳ Scraper is running in Chrome. This may take 1–2 minutes...');
+
+        fetch('/run-scraper', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    pollAssignmentScraper(btn, banner);
+                } else {
+                    showBanner(banner, 'error', '❌ ' + data.message);
+                    resetBtn(btn, '🤖 Refresh Assignments');
+                }
+            })
+            .catch(() => {
+                showBanner(banner, 'error', '❌ Could not start scraper');
+                resetBtn(btn, '🤖 Refresh Assignments');
+            });
+    }
+
+    function pollAssignmentScraper(btn, banner) {
+        clearInterval(assignPollTimer);
+        assignPollTimer = setInterval(() => {
+            fetch('/api/scraper-status')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'done') {
+                        clearInterval(assignPollTimer);
+                        showBanner(banner, 'success', '✅ Assignments updated successfully!');
+                        resetBtn(btn, '🤖 Refresh Assignments');
+                        renderAssignments(data.assignments, data.stats);
+                    } else if (data.status && data.status.startsWith('error')) {
+                        clearInterval(assignPollTimer);
+                        showBanner(banner, 'error', '❌ Scraper error. Check the terminal.');
+                        resetBtn(btn, '🤖 Refresh Assignments');
+                    }
+                    // if 'running' — keep polling
+                });
+        }, 4000); // poll every 4 seconds
+    }
+
+    function renderAssignments(assignments, stats) {
+        // Update stat cards
+        document.getElementById('a-total').textContent   = stats.total;
+        document.getElementById('a-upcoming').textContent = stats.upcoming;
+        document.getElementById('a-passed').textContent  = stats.passed;
+        document.getElementById('a-urgent').textContent  = stats.urgent;
+
+        const tbody = document.getElementById('assignTbody');
+        if (!tbody) return;
+
+        if (!assignments || assignments.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6">
+                <div class="empty-state" style="padding:40px 0">
+                    <div class="empty-icon">📭</div>
+                    <h3>No assignments found</h3>
+                </div></td></tr>`;
+            return;
+        }
+
+        let html = '';
+        assignments.forEach((a, i) => {
+            const daysHtml = buildDaysBadge(a.status, a.days_left);
+            const statusHtml = a.status === 'UPCOMING'
+                ? '<span class="pill pill-green">● Upcoming</span>'
+                : '<span class="pill pill-red">● Passed</span>';
+
+            html += `<tr data-status="${a.status}">
+                <td class="row-num">${i + 1}</td>
+                <td><span class="course-badge">${a.course}</span></td>
+                <td class="title-cell">${a.title}</td>
+                <td class="muted-cell">📅 ${a.deadline}</td>
+                <td>${daysHtml}</td>
+                <td>${statusHtml}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+
+        // Remove empty state if it was showing
+        const empty = document.getElementById('assignEmpty');
+        if (empty) empty.remove();
+    }
+
+    function buildDaysBadge(status, days) {
+        if (status !== 'UPCOMING' || days === null || days === undefined)
+            return '<span class="badge badge-muted">—</span>';
+        if (days === 0) return '<span class="badge badge-critical">Today!</span>';
+        if (days === 1) return '<span class="badge badge-urgent">Tomorrow</span>';
+        if (days <= 3)  return `<span class="badge badge-warning">${days} days</span>`;
+        return `<span class="badge badge-safe">${days} days</span>`;
+    }
+
+    // =====================================================
+    // ATTENDANCE SCRAPER — start + poll
+    // =====================================================
+    let attendPollTimer = null;
+
+    function startAttendanceScraper() {
+        const btn    = document.getElementById('attendBtn');
+        const banner = document.getElementById('attendBanner');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Scraping... please wait';
+        showBanner(banner, 'info', '⏳ Attendance scraper is running in Chrome. Please wait...');
+
+        fetch('/run-attendance-scraper', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    pollAttendanceScraper(btn, banner);
+                } else {
+                    showBanner(banner, 'error', '❌ ' + data.message);
+                    resetBtn(btn, '🤖 Refresh Attendance');
+                }
+            })
+            .catch(() => {
+                showBanner(banner, 'error', '❌ Could not start attendance scraper');
+                resetBtn(btn, '🤖 Refresh Attendance');
+            });
+    }
+
+    function pollAttendanceScraper(btn, banner) {
+        clearInterval(attendPollTimer);
+        attendPollTimer = setInterval(() => {
+            fetch('/api/attendance-status')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'done') {
+                        clearInterval(attendPollTimer);
+                        showBanner(banner, 'success', '✅ Attendance updated successfully!');
+                        resetBtn(btn, '🤖 Refresh Attendance');
+                        renderAttendance(data.courses);
+                        if (data.scraped_at) {
+                            document.getElementById('attendUpdatedAt').textContent =
+                                'Last updated: ' + data.scraped_at;
+                        }
+                    } else if (data.status && data.status.startsWith('error')) {
+                        clearInterval(attendPollTimer);
+                        showBanner(banner, 'error', '❌ Scraper error. Check the terminal.');
+                        resetBtn(btn, '🤖 Refresh Attendance');
+                    }
+                    // if 'running' — keep polling
+                });
+        }, 4000);
+    }
+
+    function loadSavedAttendance() {
+        fetch('/api/attendance')
+            .then(r => r.json())
+            .then(data => {
+                if (data.courses && data.courses.length > 0) {
+                    renderAttendance(data.courses);
+                    if (data.scraped_at) {
+                        document.getElementById('attendUpdatedAt').textContent =
+                            'Last updated: ' + data.scraped_at;
+                    }
+                }
+            });
+    }
+
+    function renderAttendance(courses) {
+        const tbody = document.getElementById('attendTbody');
+        const placeholder = document.getElementById('attendPlaceholder');
+        if (placeholder) placeholder.remove();
+
+        if (!courses || courses.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9">
+                <div class="empty-state" style="padding:40px 0">
+                    <div class="empty-icon">📊</div>
+                    <h3>No attendance data found</h3>
+                </div></td></tr>`;
+            return;
+        }
+
+        let safe = 0, warning = 0, danger = 0;
+        let html = '';
+
+        courses.forEach((c, i) => {
+            const pct = c.percentage;
+            let level, statusHtml, barClass, labelClass;
+
+            if (c.total === 0 || pct === null) {
+                level = 'safe';
+                statusHtml = '<span class="pill pill-neutral">N/A</span>';
+                barClass = 'bar-safe'; labelClass = 'bar-safe-text';
+            } else if (pct >= 75) {
+                level = 'safe'; safe++;
+                statusHtml = '<span class="pill pill-green">✅ Safe</span>';
+                barClass = 'bar-safe'; labelClass = 'bar-safe-text';
+            } else if (pct >= 60) {
+                level = 'warning'; warning++;
+                statusHtml = '<span class="pill pill-yellow">⚠️ Warning</span>';
+                barClass = 'bar-warning'; labelClass = 'bar-warning-text';
+            } else {
+                level = 'danger'; danger++;
+                statusHtml = '<span class="pill pill-red">🚨 Danger</span>';
+                barClass = 'bar-danger'; labelClass = 'bar-danger-text';
+            }
+
+            const pctCell = c.total > 0
+                ? `<div class="pct-wrap">
+                       <div class="pct-track">
+                           <div class="pct-fill ${barClass}" style="width:${Math.min(pct,100)}%"></div>
+                       </div>
+                       <span class="pct-label ${labelClass}">${pct.toFixed(1)}%</span>
+                   </div>`
+                : '<span class="badge badge-muted">—</span>';
+
+            html += `<tr data-level="${level}">
+                <td class="row-num">${c.num || i + 1}</td>
+                <td><span class="course-badge">${c.code}</span></td>
+                <td class="title-cell">${c.title}</td>
+                <td class="muted-cell small">${c.teacher}</td>
+                <td class="num-present">${c.present}</td>
+                <td class="num-absent">${c.absent}</td>
+                <td class="num-total">${c.total}</td>
+                <td>${pctCell}</td>
+                <td>${statusHtml}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('at-total').textContent   = courses.length;
+        document.getElementById('at-safe').textContent    = safe;
+        document.getElementById('at-warning').textContent = warning;
+        document.getElementById('at-danger').textContent  = danger;
+    }
+
+    // =====================================================
+    // HELPERS
+    // =====================================================
+    function showBanner(el, type, msg) {
+        el.style.display = 'block';
+        el.className = 'scraper-banner banner-' + type;
+        el.innerHTML = msg;
+    }
+
+    function resetBtn(btn, label) {
+        btn.disabled = false;
+        btn.innerHTML = label;
+    }
+
+    // =====================================================
+    // INIT
+    // =====================================================
+    document.getElementById('footerTime').textContent =
+        new Date().toLocaleString();
+    </script>
+
+</body>
+</html>
