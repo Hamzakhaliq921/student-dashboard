@@ -55,12 +55,6 @@ python app.py
 http://127.0.0.1:5000
 ```
 
-Login:
-- Username: `admin`
-- Password: `admin`
-
----
-
 ## ✨ Features
 
 - 🔐 Login protected dashboard
