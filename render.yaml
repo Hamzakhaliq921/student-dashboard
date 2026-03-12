@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: student-dashboard
+    runtime: docker
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+    disk:
+      name: db-storage
+      mountPath: /app/data
+      sizeGB: 1
