@@ -38,8 +38,8 @@ def send_notification(title, message, urgent=False):
 # ==============================
 # ✅ USER LOGIN DETAILS — EDIT THESE
 # ==============================
-ENROLLMENT = "your-enrollment-here"
-PASSWORD = "your-password-here"
+ENROLLMENT = "enrollment"
+PASSWORD = "pass"
 
 # ==============================
 # ✅ BROWSER SETUP

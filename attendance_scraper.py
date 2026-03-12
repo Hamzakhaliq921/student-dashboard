@@ -23,8 +23,8 @@ import re
 # ==============================
 # ✅ YOUR CMS LOGIN DETAILS
 # ==============================
-ENROLLMENT = "your-enrollment-here"
-PASSWORD   = "your-password-here"
+ENROLLMENT = "enrollmemt"
+PASSWORD   = "pass"
 
 # ==============================
 # ✅ BROWSER SETUP
