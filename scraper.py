@@ -10,6 +10,11 @@ from datetime import datetime
 from database import init_db, save_assignment, clear_assignments, set_scraper_status
 import time
 import re
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 try:
     from plyer import notification
@@ -38,9 +43,9 @@ def send_notification(title, message, urgent=False):
 # ==============================
 # ✅ USER LOGIN DETAILS — EDIT THESE
 # ==============================
-ENROLLMENT = "enrollment"
-PASSWORD = "pass"
 
+ENROLLMENT = os.getenv("CMS_ENROLLMENT")
+PASSWORD = os.getenv("CMS_PASSWORD")
 # ==============================
 # ✅ BROWSER SETUP
 # ==============================
