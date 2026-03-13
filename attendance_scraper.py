@@ -19,13 +19,17 @@ from webdriver_manager.chrome import ChromeDriverManager
 from database import init_db, clear_attendance, save_attendance, set_scraper_status
 import time
 import re
-
+import os as _os
+from dotenv import load_dotenv
+import os
 # ==============================
 # ✅ YOUR CMS LOGIN DETAILS
 # ==============================
-ENROLLMENT = "enrollmemt"
-PASSWORD   = "pass"
 
+load_dotenv()
+
+ENROLLMENT = os.getenv("CMS_ENROLLMENT")
+PASSWORD = os.getenv("CMS_PASSWORD")
 # ==============================
 # ✅ BROWSER SETUP
 # ==============================
