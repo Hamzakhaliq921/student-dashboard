@@ -28,8 +28,10 @@ import os
 
 load_dotenv()
 
+
 ENROLLMENT = os.getenv("CMS_ENROLLMENT")
 PASSWORD = os.getenv("CMS_PASSWORD")
+
 # ==============================
 # ✅ BROWSER SETUP
 # ==============================
