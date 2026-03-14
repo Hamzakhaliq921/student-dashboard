@@ -41,20 +41,23 @@ def send_notification(title, message, urgent=False):
         print(f"⚠️ Notification failed: {e}")
 
 # ==============================
-# ✅ USER LOGIN DETAILS — EDIT THESE
+# ✅ USER LOGIN DETAILS
 # ==============================
+
 
 ENROLLMENT = os.getenv("CMS_ENROLLMENT")
 PASSWORD = os.getenv("CMS_PASSWORD")
 # ==============================
 # ✅ BROWSER SETUP
 # ==============================
+#headless means browser cannot open
 import os as _os
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
+
 
 # Use system Chrome on server (Render), webdriver-manager locally
 if _os.path.exists("/usr/bin/chromium"):
