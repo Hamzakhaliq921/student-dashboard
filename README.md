@@ -7,14 +7,8 @@
 <img width="1336" height="525" alt="8" src="https://github.com/user-attachments/assets/247876d5-ad0f-434e-b5e4-63349ed276c9" />
 <img width="996" height="468" alt="9" src="https://github.com/user-attachments/assets/4bf6770e-8f7b-475f-88ed-0d168cfee894" />
 <img width="1326" height="461" alt="10" src="https://github.com/user-attachments/assets/86f5a359-812e-4538-be85-6230b68511e8" />
-
-
-
-
-
-
-
-
+<img width="889" height="608" alt="Capture" src="https://github.com/user-attachments/assets/2cde633d-1438-4e67-82ba-90844f7f564e" />
+<img width="448" height="204" alt="Screenshot (196)" src="https://github.com/user-attachments/assets/1efdc3d4-0d62-4d33-b980-58d91b0b54c8" />
 
 # 📚 Assignment Dashboard
 
