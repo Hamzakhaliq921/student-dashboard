@@ -266,7 +266,7 @@
 
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> Scraping... please wait';
-        showBanner(banner, 'info', '⏳ Scraper is running in Chrome. This may take 1–2 minutes...');
+        showBanner(banner, 'info', '⏳ Scraper is running in Chrome. This may take 1 minutes...');
 
         fetch('/run-scraper', { method: 'POST' })
             .then(r => r.json())
