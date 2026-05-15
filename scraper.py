@@ -38,8 +38,7 @@ def send_notification(title, message, urgent=False):
 # ==============================
 # ✅ USER LOGIN DETAILS — EDIT THESE
 # ==============================
-ENROLLMENT = "enrollment"
-PASSWORD = "pass"
+
 
 # ==============================
 # ✅ BROWSER SETUP
@@ -56,7 +55,9 @@ if _os.path.exists("/usr/bin/chromium"):
     chrome_options.binary_location = "/usr/bin/chromium"
     driver = webdriver.Chrome(service=Service("/usr/bin/chromedriver"), options=chrome_options)
 else:
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    service = Service(ChromeDriverManager().install())
+
+driver = webdriver.Chrome(service=service, options=chrome_options)
 wait = WebDriverWait(driver, 25)
 
 # ==============================

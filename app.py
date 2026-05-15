@@ -15,8 +15,8 @@ if os.path.exists("/app/data"):
 app = Flask(__name__)
 app.secret_key = "assignment_dashboard_secret_2024"
 
-USERNAME = "unknown"
-PASSWORD = "unknown"
+USERNAME = "admin"
+PASSWORD = "admin"
 
 
 # ─── AUTH ──────────────────────────────────────────────────────
