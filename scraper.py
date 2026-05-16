@@ -10,6 +10,7 @@ from datetime import datetime
 from database import init_db, save_assignment, clear_assignments, set_scraper_status
 import time
 import re
+import os
 
 try:
     from plyer import notification
@@ -41,24 +42,50 @@ def send_notification(title, message, urgent=False):
 
 
 # ==============================
-# ✅ BROWSER SETUP
+# ✅ BROWSER SETUP (FIXED FOR WINDOWS)
 # ==============================
-import os as _os
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
+chrome_options.add_argument("--disable-gpu")  # Helps with Windows compatibility
 
-# Use system Chrome on server (Render), webdriver-manager locally
-if _os.path.exists("/usr/bin/chromium"):
+# Detect environment: Linux server vs Windows local
+if os.path.exists("/usr/bin/chromium"):
+    # Linux server (Render)
     chrome_options.binary_location = "/usr/bin/chromium"
-    driver = webdriver.Chrome(service=Service("/usr/bin/chromedriver"), options=chrome_options)
+    service = Service("/usr/bin/chromedriver")
 else:
-    service = Service(ChromeDriverManager().install())
+    # Windows local — use webdriver-manager with proper cleanup
+    try:
+        from webdriver_manager.chrome import ChromeDriverManager
+        # Force fresh download and installation
+        driver_path = ChromeDriverManager().install()
+        print(f"✅ ChromeDriver installed at: {driver_path}")
+        service = Service(driver_path)
+    except Exception as e:
+        print(f"❌ ChromeDriver setup failed: {e}")
+        print("\n🔧 MANUAL FIX:")
+        print("1. Download ChromeDriver from: https://googlechromelabs.github.io/chrome-for-testing/")
+        print("2. Match your Chrome version (chrome://version/)")
+        print("3. Extract chromedriver.exe to C:\\chromedriver\\")
+        print("4. Update code to use: Service('C:\\\\chromedriver\\\\chromedriver.exe')")
+        exit(1)
 
-driver = webdriver.Chrome(service=service, options=chrome_options)
-wait = WebDriverWait(driver, 25)
+# Initialize driver
+try:
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    wait = WebDriverWait(driver, 25)
+    print("✅ Browser initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to start Chrome: {e}")
+    print("\n🔧 TROUBLESHOOTING:")
+    print("1. Ensure Chrome browser is installed")
+    print("2. Check Chrome version matches ChromeDriver")
+    print("3. Try: pip uninstall selenium webdriver-manager")
+    print("          pip install selenium==4.15.2 webdriver-manager")
+    exit(1)
 
 # ==============================
 # ✅ FUNCTION TO PARSE DEADLINE DATE
@@ -517,3 +544,4 @@ print("="*60)
 send_notification("✅ Scan Complete", "Assignment check finished. Open your dashboard!", False)
 set_scraper_status("assignment_scraper", "done")
 time.sleep(10)
+driver.quit()
