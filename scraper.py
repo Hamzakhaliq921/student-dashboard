@@ -40,7 +40,7 @@ def send_notification(title, message, urgent=False):
 # ✅ USER LOGIN DETAILS — EDIT THESE
 # ==============================
 
-
+#enter eno and password
 # ==============================
 # ✅ BROWSER SETUP (FIXED FOR WINDOWS)
 # ==============================
