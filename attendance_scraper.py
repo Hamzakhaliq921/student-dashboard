@@ -24,6 +24,7 @@ import os
 # ==============================
 # ✅ YOUR CMS LOGIN DETAILS
 # ==============================
+#enter eno and password
 
 # ==============================
 # ✅ BROWSER SETUP (FIXED FOR WINDOWS)
