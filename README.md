@@ -1,4 +1,5 @@
 # 📚 Student Dashboard — Bahria University CMS/LMS Tracker
+https://github.com/user-attachments/assets/243c578b-276f-4c7c-bb08-7469001bdb39
 
 A comprehensive web-based dashboard that automatically scrapes and tracks **assignments** and **attendance** from Bahria University's CMS and LMS portals. Built with Flask, Selenium, and SQLite.
 
